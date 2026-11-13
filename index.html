@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#6d5dfc">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="כלים">
+  <title>מי שוטף כלים</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>מי שוטף כלים 🫧</h1>
+      <p id="status" class="status"></p>
+    </div>
+    <button id="whoami" class="who" aria-label="מי אני"></button>
+  </header>
+
+  <main>
+    <div id="banner" class="banner" hidden></div>
+    <section id="turns" class="grid"></section>
+
+    <section class="card host">
+      <div>
+        <h2>🏠 אירוח</h2>
+        <p class="muted">כשנועה מארחת ארוחה זה נחשב סבב שלם, גם אצל אמא וגם אצל אבא.</p>
+      </div>
+      <button id="hostBtn" class="btn host-btn">נועה אירחה</button>
+    </section>
+
+    <section class="card">
+      <h2>מאזן</h2>
+      <div id="stats"></div>
+    </section>
+
+    <section class="card">
+      <h2>היסטוריה</h2>
+      <ul id="history" class="history"></ul>
+    </section>
+  </main>
+
+  <dialog id="whoDialog">
+    <h2>מי אתם?</h2>
+    <p class="muted">נזכור את זה במכשיר הזה ונסמן לכם כשהתור שלכם.</p>
+    <div id="whoOptions" class="who-options"></div>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
