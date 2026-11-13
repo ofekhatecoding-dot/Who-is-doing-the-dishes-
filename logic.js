@@ -75,3 +75,16 @@ export function todayStr(d = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
+
+// תחילת השבוע (יום ראשון) של תאריך נתון, בפורמט YYYY-MM-DD
+export function weekStart(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() - d.getDay());
+  return todayStr(d);
+}
+
+// אם בשבוע של התאריך הזה מישהו אירח, הארוחות של השבוע הזה הוחלפו באירוח
+export function hostInWeek(events, dateStr) {
+  const w = weekStart(dateStr);
+  return events.find((e) => e.kind === 'host' && weekStart(e.date) === w) || null;
+}

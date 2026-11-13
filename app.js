@@ -1,4 +1,4 @@
-import { KIDS, PLACES, computeStats, suggest, sortEvents, todayStr } from './logic.js';
+import { KIDS, PLACES, computeStats, suggest, sortEvents, todayStr, hostInWeek } from './logic.js';
 import { createStore } from './store.js';
 
 const $ = (sel) => document.querySelector(sel);
@@ -9,6 +9,7 @@ const state = {
   me: localStorage.getItem(WHO_KEY) || '',
   absent: { mom: new Set(), dad: new Set() },
   date: { mom: todayStr(), dad: todayStr() },
+  override: { mom: false, dad: false },
   mode: 'local',
   error: false,
 };
@@ -71,6 +72,18 @@ function renderWho() {
 function renderTurns() {
   $('#turns').innerHTML = ['mom', 'dad']
     .map((place) => {
+      const host = hostInWeek(state.events, state.date[place]);
+      if (host && !state.override[place]) {
+        return `
+      <article class="card turn ${place}">
+        <header>
+          <h2>אצל ${PLACES[place]}</h2>
+          <input type="date" value="${state.date[place]}" max="${todayStr()}" data-act="date" data-place="${place}" aria-label="תאריך הארוחה">
+        </header>
+        <div class="skip">${avatar(host.washer, true)}<p><b>${host.washer}</b> אירחה השבוע, אז אין שטיפה אצל ${PLACES[place]}.<br><span class="muted">זה נחשב לה כשטיפה, ותדולג כשיגיע תורה.</span></p></div>
+        <button class="btn ghost" data-act="override" data-place="${place}">בכל זאת לרשום שטיפה</button>
+      </article>`;
+      }
       const absent = [...state.absent[place]];
       const s = suggest(state.events, place, absent);
       const others = s.ranking.slice(1);
@@ -175,6 +188,7 @@ async function log(ev, label) {
   if (ev.place) {
     state.absent[ev.place] = new Set();
     state.date[ev.place] = todayStr();
+    state.override[ev.place] = false;
   }
   toast(label, () => store.remove(id));
   render();
@@ -189,6 +203,9 @@ document.addEventListener('click', async (ev) => {
     const set = state.absent[place];
     set.has(kid) ? set.delete(kid) : set.add(kid);
     if (set.size === KIDS.length) set.delete(kid); // לפחות אחד נוכח
+    render();
+  } else if (act === 'override') {
+    state.override[place] = true;
     render();
   } else if (act === 'wash') {
     const absent = [...state.absent[place]];
@@ -211,6 +228,7 @@ document.addEventListener('change', (ev) => {
   const t = ev.target.closest('[data-act="date"]');
   if (t && t.value) {
     state.date[t.dataset.place] = t.value;
+    state.override[t.dataset.place] = false;
     render();
   }
 });

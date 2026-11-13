@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { computeStats, suggest, KIDS } from '../logic.js';
+import { computeStats, suggest, KIDS, weekStart, hostInWeek } from '../logic.js';
 
 let t = 0;
 const wash = (place, washer, date, extra = {}) => ({ kind: 'wash', place, washer, date, createdAt: ++t, ...extra });
@@ -65,5 +65,22 @@ for (let w = 0; w < 30; w++) {
     // אירוח מוסיף נקודה לנועה, אז הפער יכול לגדול רק בגללו; בלי אירוח הפער <= 1
     if (!ev.some((e) => e.kind === 'host')) assert.ok(Math.max(...v) - Math.min(...v) <= 1);
   }
+}
+// 10. אירוח מדלג: נועה מארחת, נווה ואופק שוטפים, ורק אז נועה חוזרת לתור
+{
+  let e = [host('נועה', '2026-11-01')];
+  const a = suggest(e, 'mom').kid; e.push(wash('mom', a, '2026-11-08'));
+  const b = suggest(e, 'mom').kid; e.push(wash('mom', b, '2026-11-15'));
+  assert.deepEqual([a, b].sort(), ['אופק', 'נווה'].sort());
+  assert.equal(suggest(e, 'mom').kid, 'נועה');
+}
+
+// 11. שבוע (ראשון עד שבת) ואירוח
+{
+  assert.equal(weekStart('2026-11-13'), '2026-11-08'); // שישי -> ראשון קודם
+  assert.equal(weekStart('2026-11-08'), '2026-11-08');
+  const e = [host('נועה', '2026-11-10')];
+  assert.equal(hostInWeek(e, '2026-11-13').washer, 'נועה');
+  assert.equal(hostInWeek(e, '2026-11-15'), null); // השבוע הבא
 }
 console.log('כל הבדיקות עברו');
